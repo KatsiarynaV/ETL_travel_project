@@ -85,7 +85,7 @@ x-airflow-common:
 
 services:
   clickhouse:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:25.7.1.3997-stable
     ulimits:
       nofile:
         soft: 262144
@@ -143,7 +143,7 @@ services:
 
 
   redis:
-    image: redis:latest
+    image: redis:8.0.3
     expose:
       - 6379
     healthcheck:
