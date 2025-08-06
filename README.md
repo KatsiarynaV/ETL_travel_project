@@ -21,4 +21,4 @@ visits - турист, достопримечательность, дата
 
 Схема:
 
-![Diagram](https://github.com/user-attachments/assets/5a568717-3b14-47ff-9e94-ab72be4e1343)
+![Diagram](https://github.com/user-attachments/assets/40e915f6-0f83-41d2-bf45-0fa0cd22bcfc)
