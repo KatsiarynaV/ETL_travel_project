@@ -15,7 +15,7 @@ faker = Faker()
 
 # Конфигурация подключения к MongoDB
 MONGO_URI =  Variable.get("mongo_uri")
-DB_NAME = Variable.get("travel_raw")
+DB_NAME = Variable.get("mongo_schema")
 
 
 def get_mongo_conn():

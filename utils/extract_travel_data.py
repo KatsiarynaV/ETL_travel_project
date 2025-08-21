@@ -15,7 +15,7 @@ load_dotenv()
 
 OTM_API_KEY = os.getenv("OTM_API_KEY")
 MONGO_URI =  Variable.get("mongo_uri")
-DB_NAME = Variable.get("travel_raw")
+DB_NAME = Variable.get("mongo_schema")
 
 
 def get_mongo_conn():
