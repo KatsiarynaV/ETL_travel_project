@@ -9,7 +9,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Подключение к MongoDB
 MONGO_URI =  Variable.get("mongo_uri")
-DB_NAME = Variable.get("travel_raw")
+DB_NAME = Variable.get("mongo_schema")
+
+mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+mongo_db = mongo_client[DB_NAME]
 
 # Подключение к Postgres через Airflow Hook
 pg_hook = PostgresHook(postgres_conn_id='my_postgres_conn')
