@@ -4,6 +4,7 @@ from faker import Faker
 from uuid import uuid4
 from pymongo import MongoClient, errors
 import logging
+from airflow.models import Variable
 
 
 # Настройка логгирования
@@ -13,8 +14,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 faker = Faker()
 
 # Конфигурация подключения к MongoDB
-MONGO_URI = "mongodb://root:root@mongodb:27017/"
-DB_NAME = "travel_raw"
+MONGO_URI =  Variable.get("mongo_uri")
+DB_NAME = Variable.get("travel_raw")
 
 
 def get_mongo_conn():

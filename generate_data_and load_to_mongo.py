@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(SCRIPT_PATH))
 
 default_args = {
     'owner': 'Kate',
-    'depands_on_past': False,
+    'depends_on_past': False,
     'start_date': datetime(2025, 8, 5),
 }
 

@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import logging
 import os
 from dotenv import load_dotenv
+from airflow.models import Variable
 
 # Настройка логгирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -13,8 +14,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 load_dotenv()
 
 OTM_API_KEY = os.getenv("OTM_API_KEY")
-MONGO_URI = "mongodb://root:root@mongodb:27017/"
-DB_NAME = "travel_raw"
+MONGO_URI =  Variable.get("mongo_uri")
+DB_NAME = Variable.get("travel_raw")
 
 
 def get_mongo_conn():
