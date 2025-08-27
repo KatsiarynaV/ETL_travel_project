@@ -24,6 +24,7 @@ class POIModel(BaseModel):
     latitude: float
     longitude: float
     poi_timestamp: Optional[datetime]
+    rating: Optional[float]
 
 class TouristModel(BaseModel):
     user_id: UUID
