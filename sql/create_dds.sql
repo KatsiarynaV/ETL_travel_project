@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS dds.opentripmap_pois (
     country_code CHAR(2) REFERENCES dds.rest_countries(country_code),
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
-    poi_timestamp TIMESTAMP WITH TIME ZONE
+    poi_timestamp TIMESTAMP WITH TIME ZONE,
+    rating DOUBLE PRECISION
 );
 
 CREATE TABLE IF NOT EXISTS dds.tourists (

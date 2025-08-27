@@ -49,7 +49,8 @@ def transform_pois(df):
     # Если 'point' является словарём, берём значение по ключу 'lon', иначе ставим None.
     df['longitude'] = df['point'].apply(lambda x: x.get('lon') if isinstance(x, dict) else None)
     df['poi_timestamp'] = pd.to_datetime(df['timestamp'])
-    return df[['xid', 'name', 'description', 'image', 'kinds', 'otm_url', 'country_code', 'latitude', 'longitude', 'poi_timestamp']]
+    df['rating'] = df.get('rate') if 'rate' in df.columns else df.get('rating')
+    return df[['xid', 'name', 'description', 'image', 'kinds', 'otm_url', 'country_code', 'latitude', 'longitude', 'poi_timestamp', 'rating']]
 
 def transform_countries(df):
     """Трансформация данных таблицы countries"""
