@@ -1,5 +1,5 @@
 import pandas as pd
-
+import uuid
 import logging
 import random
 from airflow.providers.postgres.hooks.postgres import PostgresHook
@@ -45,24 +45,47 @@ def clean_and_validate(df: pd.DataFrame, model, drop_duplicates_by=None, not_nul
 
     return df_clean
 
-def get_random_xids():
-    """Получает список всех xid из ods.opentripmap_pois"""
-    query = "SELECT xid FROM ods.opentripmap_pois"
+def get_random_xids_with_weights():
+    """Получает список xid и рейтинги для взвешенного выбора"""
+    query = "SELECT xid, rating FROM ods.opentripmap_pois"
     with engine.connect() as conn:
         df_xid = pd.read_sql(query, conn)
-    xids = df_xid["xid"].dropna().tolist()
-    logging.info(f"Получено {len(xids)} xid для рандомной замены")
-    return xids
 
-def clean_visits(df_visits: pd.DataFrame):
-    """Заменяет place_id на случайный xid"""
-    xids = get_random_xids()
+    if df_xid.empty:
+        logging.warning("ods.opentripmap_pois пуст — замена невозможна")
+        return [], []
+
+    xids = df_xid["xid"].tolist()
+    # если rate пустой, то подставляем 1
+    weights = df_xid["rating"].fillna(1).tolist()
+    return xids, weights
+
+
+def expand_visits_random(df_visits: pd.DataFrame, min_visits=1, max_visits=20):
+    """
+    Создает случайное количество визитов для каждой строки df_visits.
+    place_id выбирается случайно с учетом рейтинга из ods.opentripmap_pois.
+    Генерирует уникальный visit_id для каждой новой строки.
+    """
+    xids, weights = get_random_xids_with_weights()
     if not xids:
-        logging.warning("Список xid пуст — замена невозможна")
+        logging.warning("Нет доступных POI для генерации визитов")
         return df_visits
 
-    df_visits["place_id"] = [random.choice(xids) for _ in range(len(df_visits))]
-    return df_visits
+    expanded_rows = []
+
+    for _, row in df_visits.iterrows():
+        visits_per_place = random.randint(min_visits, max_visits)  # случайное количество визитов
+        chosen_xids = random.choices(xids, weights=weights, k=visits_per_place)
+        for xid in chosen_xids:
+            new_row = row.copy()
+            new_row["place_id"] = xid
+            new_row["visit_id"] = str(uuid.uuid4())
+            expanded_rows.append(new_row)
+
+    df_expanded = pd.DataFrame(expanded_rows)
+    logging.info(f"Расширено {len(df_visits)} исходных визитов до {len(df_expanded)} строк")
+    return df_expanded
 
 def filter_existing_records(df: pd.DataFrame, table: str, key_fields: list):
     """Удаляет строки из df, которые уже существуют в целевой таблице по ключевым полям"""
@@ -127,7 +150,7 @@ def load_all_to_dds():
     load_table("SELECT * FROM ods.visits",
                 VisitModel, "visits",
                 drop_duplicates_by=["visit_id"], not_null_fields=["visit_id", "user_id"],
-                custom_clean_func=clean_visits)
+                custom_clean_func=lambda df: expand_visits_random(df, min_visits=1, max_visits=20))
 
     load_table("SELECT * FROM ods.search_events",
                SearchEventModel, "search_events",
