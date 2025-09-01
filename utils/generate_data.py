@@ -45,6 +45,17 @@ def generate_tourists():
 def generate_bookings(tourists):
     """Генерация синтетических бронирований"""
     bookings = []
+    popular_countries = [
+    "France", "Italy", "Spain", "USA", "Thailand", "Japan", "Greece", "Turkey", "Mexico", "Germany",
+    "United Kingdom", "Australia", "Netherlands", "Portugal", "Russia", "China", "Switzerland", "Canada",
+    "United Arab Emirates", "India", "Brazil", "South Korea", "Malaysia", "Singapore", "Croatia", "Belgium",
+    "Egypt", "Morocco", "Sweden", "Norway", "Denmark", "Finland", "Iceland", "New Zealand", "Vietnam",
+    "Indonesia", "Philippines", "Czech Republic", "Hungary", "Poland", "South Africa", "Argentina",
+    "Chile", "Peru", "Colombia", "Saudi Arabia", "Israel", "Ireland", "Austria", "Slovenia", "Slovakia",
+    "Romania", "Bulgaria", "Ukraine", "Turkey", "Thailand", "Maldives", "Mauritius", "Seychelles",
+    "Costa Rica", "Panama", "Cuba", "Jamaica", "Dominican Republic", "Hawaii", "Singapore", "Hong Kong",
+    "Taiwan", "Morocco", "Kenya"
+    ]
     for _ in range(900):
         tourist = random.choice(tourists)
         start = faker.date_between(start_date='-1y', end_date='today')
@@ -53,7 +64,7 @@ def generate_bookings(tourists):
         bookings.append({
             "booking_id": str(uuid4()),
             "user_id": tourist["user_id"],
-            "destination": faker.country(),
+            "destination": random.choice(popular_countries),
             "type": random.choice(["flight", "hotel", "tour"]),
             "category": random.choice(['beach', 'museum', 'city', 'nature', 'history', 'shopping', 'relax']),
             "status": random.choice(["confirmed", "cancelled"]),
