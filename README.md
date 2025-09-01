@@ -75,4 +75,70 @@ Airflow отвечает за автоматический запуск ETL-пр
 | Визуализация | Metabase | 
 | Уведомления | Telegram Bot | 
 
+## **Пайплайн:**
+
+### 1. Загрузка данных в MongoDB (Raw Layer)
+
+*fetch_data_and_load_to_mongo.py*
+
+DAG, который обращается к API (OpenTripMap, REST Countries) и загружает «сырые» данные в MongoDB
+
+*generate_data_and_load_to_mongo.py*
+
+DAG, который создаёт синтетические данные (туристы, бронирования, поиски, визиты) и также пишет их в MongoDB
+
+**Результат:** в MongoDB лежат все исходные данные (RAW слой). Таблицы: opentripmap_pois_detailed, rest_countries, synthetic_bookings, synthetic_searches, synthetic_tourists, synthetic_visits
+
+![mongo_poi](https://github.com/user-attachments/assets/8d200a21-88d1-4674-8fbd-9200a3a83fb0)
+
+### 2. Инициализация схем в PostgreSQL (ODS + DDS)
+
+*init_schemas_dag.py*
+
+DAG, который создаёт базовые схемы и таблицы в PostgreSQL (ODS и DDS слои).
+
+**Результат:** подготовлена структура БД для загрузки данных.
+
+### 3. Загрузка в ODS (Operational Data Store)
+
+*load_data_to_ods_postgres.py*
+
+DAG, который переносит данные из MongoDB → PostgreSQL (ODS слой).
+
+Результат: данные в ODS приведены к более структурированному виду.
+
+![bookings_table](https://github.com/user-attachments/assets/5205c865-cc7c-40b8-ad5a-4002d3a4607a)
+
+### 4. Трансформация ODS → DDS
+
+*transfer_to_dds_dag.py*
+
+DAG, который берёт данные из ODS и переносит их в DDS слой с удалением дубликатов и валидацмей данных через Pydantic
+
+Результат: готовый слой DDS 
+
+![bookings_table_dds](https://github.com/user-attachments/assets/5b883dc0-990a-4a8f-9e0d-69988ff12134)
+
+### 5. Формирование витрины в ClickHouse
+
+dds_to_clickhouse_dag.py
+
+Загружает данные из DDS в ClickHouse.
+
+Здесь выполняется агрегация и денормализация для расчета метрик и аналитических запросов.
+
+Результат: аналитические витрины доступны для построения дашбордов в Metabase.
+
+![bookings_table_ch](https://github.com/user-attachments/assets/bfaf0e5f-ac25-4cfe-b014-06c0e2c76ad5)
+
+
+
+
+
+
+
+
+
+
+
 
